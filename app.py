@@ -6,9 +6,9 @@ from google import genai
 
 app = Flask(__name__)
 
-# Configuración de la API Key
-API_KEY = "AQ.Ab8RN6Jd_qiGFwEfWr3g76xdD5uX1NFQduid43_cJG1vE5U9Pg"
-client = genai.Client(api_key=API_KEY)
+# Configuración de la API Key desde la Variable de Entorno
+API_KEY = os.environ.get("GEMINI_API_KEY")
+client = genai.Client(api_key=API_KEY) if API_KEY else None
 
 HTML_TEMPLATE = """
 <!DOCTYPE html>
@@ -98,6 +98,9 @@ def home():
 def chat():
     data = request.get_json()
     user_message = data.get('message', '')
+
+    if not client:
+        return jsonify({'response': 'Error de configuración: no se encontró la GEMINI_API_KEY en las variables de entorno.'})
 
     system_instruction = (
         "Sos URSUK, un asistente inteligente creado por Ariel Toscano. "
